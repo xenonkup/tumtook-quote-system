@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-
-const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
+import { createQuote, type Quote } from "@/lib/fetchdata";
 
 // ตัวเลือกทั้งหมด — ต้องตรงกับ config ใน backend (pricing.go)
 const PRODUCTS = [
@@ -26,16 +25,6 @@ const OPTIONS = [
   { id: "diecut", name: "ไดคัทรูปทรง (+1.00 ฿/ชิ้น)" },
 ];
 
-type QuoteResult = {
-  id: number;
-  productName: string;
-  quantity: number;
-  unitPrice: number;
-  discountPercent: number;
-  optionsCost: number;
-  total: number;
-};
-
 const baht = (n: number) =>
   n.toLocaleString("th-TH", { style: "currency", currency: "THB" });
 
@@ -51,7 +40,7 @@ export default function Home() {
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
 
-  const [result, setResult] = useState<QuoteResult | null>(null);
+  const [result, setResult] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -66,27 +55,18 @@ export default function Home() {
     setError("");
     setResult(null);
     try {
-      const res = await fetch(`${API}/api/quote`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          productId,
-          size,
-          material,
-          quantity: Number(quantity),
-          options,
-          customerName,
-          customerPhone,
-        }),
+      const data = await createQuote({
+        productId,
+        size,
+        material,
+        quantity: Number(quantity),
+        options,
+        customerName,
+        customerPhone,
       });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "เกิดข้อผิดพลาด");
-        return;
-      }
       setResult(data);
-    } catch {
-      setError("เชื่อมต่อ server ไม่ได้ — ตรวจว่า backend รันอยู่ที่ " + API);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาด");
     } finally {
       setLoading(false);
     }
