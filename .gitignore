@@ -1,0 +1,31 @@
+# ===== Secrets / env (สำคัญสุด อย่าให้หลุดขึ้น repo) =====
+.env
+*.env
+**/.env
+**/.env.local
+**/.env*.local
+
+# ===== Go backend =====
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
+backend/*.test
+backend/*.out
+backend/tmp/
+backend/bin/
+
+# ===== Node / Next.js frontend =====
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/.vercel/
+frontend/*.tsbuildinfo
+
+# ===== OS / Editor =====
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
